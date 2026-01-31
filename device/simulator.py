@@ -11,18 +11,35 @@ class IoTDeviceSimulator:
         self.mqtt = MQTTClient(client_id=self.device_id)
 
     def sample_sensors(self):
-        return {
+        temp = self.temp_sensor.read()
+        hum = self.humidity_sensor.read()
+
+        data = {
             "device_id": self.device_id,
-            "timestamp": int(time.time()),
-            "temperature": self.temp_sensor.read(),
-            "humidity": self.humidity_sensor.read()
+            "timestamp": int(time.time())
         }
+
+        if temp is not None:
+            data["temperature"] = temp
+        else:
+            data["sensor_error"] = "TEMP_SENSOR_FAIL"
+
+        if hum is not None:
+            data["humidity"] = hum
+        else:
+            data["sensor_error"] = "HUMIDITY_SENSOR_FAIL"
+
+        return data
+
 
     def edge_alerts(self, data):
         alerts = []
-        if data["temperature"] > 35:
+
+        if "temperature" in data and data["temperature"] > 35:
             alerts.append("EDGE_HIGH_TEMP")
+
         return alerts
+
 
     def run(self):
         print("Connecting to MQTT broker...", flush=True)

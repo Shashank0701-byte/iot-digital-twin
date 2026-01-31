@@ -7,10 +7,12 @@ from database import init_db, insert_telemetry
 def on_message(client, userdata, msg):
     data = json.loads(msg.payload.decode())
     print("Received:", data)
-
-    alerts = check_alerts(data)
-    if alerts:
-        print("🚨 CLOUD ALERTS:", alerts)
+    if "temperature" in data and "humidity" in data:
+        alerts = check_alerts(data)
+        if alerts:
+            print("🚨 CLOUD ALERTS:", alerts)
+    else:
+        print("⚠️ Incomplete data from", data["device_id"])
 
     insert_telemetry(data)
 

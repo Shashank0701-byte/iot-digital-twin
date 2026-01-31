@@ -13,3 +13,9 @@ data/
 models/
 checkpoints/
 temp/
+telemetry/
+results/
+*.sqlite3
+secrets.json
+
+*.db

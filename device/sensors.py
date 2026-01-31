@@ -6,9 +6,11 @@ class TemperatureSensor:
         self.base = base
 
     def read(self):
+        if random.random() < 0.05:  # 5% failure
+            return None
+
         noise = random.uniform(-0.5, 0.5)
-        drift = random.uniform(-0.05, 0.05)
-        self.base += drift
+        self.base += random.uniform(-0.05, 0.05)
         return round(self.base + noise, 2)
 
 
