@@ -1,12 +1,14 @@
 import time
 from sensors import TemperatureSensor, HumiditySensor
-from config import DEVICE_ID, SAMPLING_INTERVAL_SEC
+from config import DEVICE_ID, SAMPLING_INTERVAL_SEC, MQTT_TOPIC
+from mqtt_client import MQTTClient
 
 class IoTDeviceSimulator:
     def __init__(self):
         self.device_id = DEVICE_ID
         self.temp_sensor = TemperatureSensor()
         self.humidity_sensor = HumiditySensor()
+        self.mqtt = MQTTClient(client_id=self.device_id)
 
     def sample_sensors(self):
         return {
@@ -17,10 +19,14 @@ class IoTDeviceSimulator:
         }
 
     def run(self):
-        print("Starting IoT Device Simulator...")
+        print("Connecting to MQTT broker...")
+        self.mqtt.connect()
+        print("Device running...")
+
         while True:
             data = self.sample_sensors()
-            print("Telemetry:", data)
+            print("Publishing:", data)
+            self.mqtt.publish(MQTT_TOPIC, data)
             time.sleep(SAMPLING_INTERVAL_SEC)
 
 
