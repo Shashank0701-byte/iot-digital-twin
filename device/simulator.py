@@ -18,15 +18,27 @@ class IoTDeviceSimulator:
             "humidity": self.humidity_sensor.read()
         }
 
+    def edge_alerts(self, data):
+        alerts = []
+        if data["temperature"] > 35:
+            alerts.append("EDGE_HIGH_TEMP")
+        return alerts
+
     def run(self):
-        print("Connecting to MQTT broker...")
+        print("Connecting to MQTT broker...", flush=True)
         self.mqtt.connect()
-        print("Device running...")
+        print("Device running...", flush=True)
 
         while True:
             data = self.sample_sensors()
-            print("Publishing:", data)
+
+            edge_alerts = self.edge_alerts(data)
+            if edge_alerts:
+                data["edge_alerts"] = edge_alerts
+
+            print("Publishing:", data, flush=True)
             self.mqtt.publish(MQTT_TOPIC, data)
+
             time.sleep(SAMPLING_INTERVAL_SEC)
 
 
