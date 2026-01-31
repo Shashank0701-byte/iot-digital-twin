@@ -2,6 +2,7 @@ import json
 import paho.mqtt.client as mqtt
 from config import MQTT_BROKER, MQTT_PORT, MQTT_TOPIC
 from alert_engine import check_alerts
+from database import init_db, insert_telemetry
 
 def on_message(client, userdata, msg):
     data = json.loads(msg.payload.decode())
@@ -9,7 +10,9 @@ def on_message(client, userdata, msg):
 
     alerts = check_alerts(data)
     if alerts:
-        print("🚨 ALERTS:", alerts)
+        print("🚨 CLOUD ALERTS:", alerts)
+
+    insert_telemetry(data)
 
 client = mqtt.Client(
     protocol=mqtt.MQTTv311,
@@ -20,5 +23,6 @@ client.on_message = on_message
 client.connect(MQTT_BROKER, MQTT_PORT, 60)
 client.subscribe(MQTT_TOPIC)
 
-print("Cloud subscriber running...")
+init_db()
+print("Cloud subscriber running with DB storage...")
 client.loop_forever()
