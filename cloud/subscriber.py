@@ -12,7 +12,8 @@ def on_message(client, userdata, msg):
         if alerts:
             print("🚨 CLOUD ALERTS:", alerts)
     else:
-        print("⚠️ Incomplete data from", data["device_id"])
+        print(f"⚠️ Incomplete data from {data['device_id']}")
+
 
     insert_telemetry(data)
 
